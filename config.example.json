@@ -1,0 +1,143 @@
+{
+  "applicationName": "example-app",
+  "deployStep": "DEV",
+  "buildTargetBranch": "main",
+  "imageTagMutability": false,
+  "stageConfig": {
+    "development": {
+      "rds": {
+        "databaseName": "application",
+        "engineVersion": "3.03.0",
+        "parameters": {
+          "time_zone": "Asisa/Tokyo"
+        },
+        "serverless": true,
+        "autoPauseMinutes": 30,
+        "minCapacity": 1,
+        "maxCapacity": 1
+      },
+      "ecs": {
+        "web": {
+          "tag": "latest",
+          "containerName": "app",
+          "containerPort": 80,
+          "secretKeys": ["ENV"],
+          "cpu": 256,
+          "memory": 512,
+          "useSpot": true
+        },
+        "batches": [
+          {
+            "batchName": "sample",
+            "tag": "latest",
+            "containerName": "app",
+            "secretKeys": ["ENV"],
+            "cpu": 256,
+            "memory": 512,
+            "command": ["ls", "-l"],
+            "cron": {
+              "minute": "*/10"
+            }
+          }
+        ]
+      }
+    },
+    "staging": {
+      "rds": {
+        "databaseName": "application",
+        "engineVersion": "3.03.0",
+        "parameters": {
+          "time_zone": "Asisa/Tokyo"
+        },
+        "serverless": true,
+        "autoPause": 60,
+        "minCapacity": 1,
+        "maxCapacity": 2
+      },
+      "ecs": {
+        "web": {
+          "tag": "latest",
+          "containerName": "app",
+          "containerPort": 80,
+          "secretKeys": ["ENV"],
+          "cpu": 256,
+          "memory": 512,
+          "https": {
+            "certificateArn": "arn:::",
+            "sslPolicy": "RECOMMENDED",
+            "redirectHttp": true
+          },
+          "autoScaling": {
+            "minCapacity": 1,
+            "maxCapacity": 1,
+            "cpuPercent": 70,
+            "memoryPercent": 70
+          },
+          "useSpot": true
+        },
+        "batches": [
+          {
+            "batchName": "sample",
+            "tag": "latest",
+            "containerName": "app",
+            "secretKeys": ["ENV"],
+            "cpu": 256,
+            "memory": 512,
+            "command": ["ls", "-l"],
+            "cron": {
+              "minute": "*/10"
+            }
+          }
+        ]
+      }
+    },
+    "production": {
+      "rds": {
+        "databaseName": "application",
+        "engineVersion": "3.03.0",
+        "parameters": {
+          "time_zone": "Asisa/Tokyo"
+        },
+        "serverless": false,
+        "instanceType": "db.m5.large",
+        "instances": 2
+      },
+      "ecs": {
+        "web": {
+          "tag": "latest",
+          "containerName": "app",
+          "containerPort": 80,
+          "secretKeys": ["ENV"],
+          "cpu": 256,
+          "memory": 512,
+          "https": {
+            "certificateArn": "arn:::",
+            "sslPolicy": "RECOMMENDED",
+            "redirectHttp": true
+          },
+          "autoScaling": {
+            "minCapacity": 1,
+            "maxCapacity": 1,
+            "cpuPercent": 70,
+            "memoryPercent": 70
+          },
+          "useSpot": false
+        },
+        "batches": [
+          {
+            "batchName": "sample",
+            "tag": "latest",
+            "containerName": "app",
+            "secretKeys": ["ENV"],
+            "cpu": 256,
+            "memory": 512,
+            "command": ["ls", "-l"],
+            "cron": {
+              "minute": "*/10"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
